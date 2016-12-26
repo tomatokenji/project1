@@ -36,6 +36,13 @@ progress {
   background-color: blue;
 }
 
+.ownTurf{
+  position: absolute;
+  bottom: 0%;
+  height: 10%;
+  width: 100%;
+  background-color: green;
+}
 
 .story{
   display: flex;

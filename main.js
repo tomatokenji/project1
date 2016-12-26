@@ -9,7 +9,6 @@ $(document).ready(function(){
   function Chapter(){
     this.prelude = function(){};
     this.startGame = function(){};
-
   }
 
   //game character
@@ -17,8 +16,10 @@ $(document).ready(function(){
     this.health = 100;
   }
 
-  function Enemy(index){
-    this.intervalIndex = index;
+  //enemy object
+  function Enemy(index, address){
+    this.index = index;
+    this.address = address;
   }
 
   //generate enemy location random. div class="enemy"
@@ -26,56 +27,92 @@ $(document).ready(function(){
     //horizontal appearance
     var randomNo = Math.random()*90;
     //vertical appearance
-    var randomNo2 = Math.random()*90;
+    var randomNo2 = Math.random()*80;
     $('.gameplay').append('<div class="enemy">');
     var lastEnemy = $('.enemy:last');
     $(lastEnemy).css({
         'left':randomNo+'%',
         'top':randomNo2+'%',
-      },movingEnemy(lastEnemy)), console.log(lastEnemy);
-    removeEnemy(lastEnemy);
-    //what happens when enemy touches :D
+    });
 
+    var index = movingEnemy(lastEnemy);
+    removeEnemy(lastEnemy, index);
+
+    var enemy = new Enemy(index, lastEnemy);
+    enemyArray.push(enemy);
   }
 
   //prelude - sliding stuff
   $('#okay').click(function(){
     $('.story').slideToggle("slow",function(){
+      if(hasGameStarted===false){
+        hasGameStarted===true;
+        initGameOne();
+      }
+      else if(isPauseTrue === true){
+        isPauseTrue === false;
+        startGame();
+      }else{
+        isPauseTrue === true;
+        pauseGame();
+      }
     })
   })
 
   $('#storyButton').click(function(){
     $('.story').slideToggle("slow",function(){
+      if(isPauseTrue === true){
+        isPauseTrue === false;
+        startGame();
+      }else{
+        isPauseTrue === true;
+        pauseGame();
+      }
     })
   })
 
 
   //at click what happens - enemy disappear, score +=1
-  $('.enemy').click(function(){
-    this.remove();
-    playerScore +=1;
-  })
+  // $('.enemy').click(function(){
+  //   this.remove();
+  //   playerScore +=1;
+  // })
 
 
-  //enemy moving animation
+  //enemy random moving animation
   function movingEnemy(something){
     var index = setInterval(function(){
       var random = Math.random();
-      if(random<0.33){
+      var topPosition = parseInt(something[0].style.top);
+      var leftPosition = parseInt(something[0].style.left);
+      console.log(leftPosition);
+
+      if(random<0.33 && leftPosition <= 85.1){
         $(something).css({
-          'left': "+=2%",
+          'left': "+=5%",
         })
-      }else if(random<0.66){
+      }else if(random<0.66 && topPosition <= 80.1){
         $(something).css({
-          'top':"+=2%",
+          'top':"+=5%",
         })
-      }else{
+      }else if(leftPosition>2){
         $(something).css({
-          'left':"-=2%",
+          'left':"-=5%",
         })
-      }; console.log(something[0].style.top);
+      };
+
+      //health function
+      if(topPosition >=80){
+        health -=5;
+        $('#health').prop("value", health);
+      }
+
+      if(dead(health)){
+        gameOver();
+      }
+      console.log(something[0].style.left);
     }, 500);
-    enemyArray.push(new Enemy(index))
+    return index;
   }
 
 
@@ -88,16 +125,17 @@ $(document).ready(function(){
 
   //global variables
   var playerScore = 0;
+  var health = 100;
   var enemyArray = [];
-
-
-
+  var isPauseTrue = false;
+  var hasGameStarted = false;
   //game logic -> when does game end
-  generateEnemy();
 
-  function removeEnemy(enemy){
+
+  function removeEnemy(enemy, index){
     $(enemy).click(function(){
-      clearInterval()
+      console.log(index);
+      clearInterval(index);
       $(enemy).remove();
       playerScore +=1;
       //update playerScore
@@ -105,6 +143,47 @@ $(document).ready(function(){
     })
   }
 
+  //dead function
+  function dead(userHealth){
+    if(userHealth <=0){
+      return true;
+    }
+  }
+
+  //gameOver
+  function gameOver(){
+    $('.story').html("you have died");
+
+    pauseGame();
+    enemyArray = [];
+    $('.story').show();
+
+  }
+
+  //function pauseGame
+  function pauseGame(){
+    for(var i=0; i<enemyArray.length; i++){
+      clearInterval(enemyArray[i].index);
+    }
+    console.log("paused");
+  }
+
+  //function startGame
+  function startGame(){
+    for(var i=0; i<enemyArray.length; i++){
+      var index = movingEnemy(enemyArray[i].address);
+      enemyArray[i].index = index;
+      removeEnemy(enemyArray[i].address, index);
+    }
+    console.log("start");
+  }
+
+  //function initiateGame
+  function initGameOne(){
+    generateEnemy();
+    generateEnemy();
+    generateEnemy();
+  }
   //implement functions
 
 
