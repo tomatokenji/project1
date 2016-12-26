@@ -46,14 +46,14 @@ $(document).ready(function(){
   $('#okay').click(function(){
     $('.story').slideToggle("slow",function(){
       if(hasGameStarted===false){
-        hasGameStarted===true;
+        hasGameStarted=true;
         initGameOne();
       }
       else if(isPauseTrue === true){
-        isPauseTrue === false;
+        isPauseTrue = false;
         startGame();
       }else{
-        isPauseTrue === true;
+        isPauseTrue = true;
         pauseGame();
       }
     })
@@ -62,10 +62,10 @@ $(document).ready(function(){
   $('#storyButton').click(function(){
     $('.story').slideToggle("slow",function(){
       if(isPauseTrue === true){
-        isPauseTrue === false;
+        isPauseTrue = false;
         startGame();
       }else{
-        isPauseTrue === true;
+        isPauseTrue = true;
         pauseGame();
       }
     })
@@ -140,6 +140,10 @@ $(document).ready(function(){
       playerScore +=1;
       //update playerScore
       $('#player1-score').text(playerScore);
+
+      enemyArray = $.grep(enemyArray, function(e){
+        return e.index != index;
+      })
     })
   }
 
