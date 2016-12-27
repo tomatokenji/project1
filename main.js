@@ -2,7 +2,7 @@ $(document).ready(function(){
 
   //game logic
   function Game(){
-    this.chapter = [];
+    this.chapters = [];
   };
 
   //game chapter
