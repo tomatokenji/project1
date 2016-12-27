@@ -2,21 +2,38 @@ $(document).ready(function(){
 
   //game logic
   function Game(){
-    this.chapters = [];
+    this.chapter = [];
   };
 
   //game chapter
   function Chapter(){
-    this.prelude = function(){};
-    this.startGame = function(){};
+    this.prelude = "";
+    this.gameFunctions = {
+
+    }
   }
 
   //game character
   function Character(){
     this.health = 100;
+    this.name = "default";
+    this.picture = "";
   }
 
+  //global variables
+  var playerScore = 0;
+  var health = 100;
+  var enemyArray = [];
+  var isPauseTrue = false;
+  var hasGameStarted = false;
+
+
+
+//Chapter 1 objects
   //enemy object
+
+
+
   function Enemy(index, address){
     this.index = index;
     this.address = address;
@@ -52,6 +69,7 @@ $(document).ready(function(){
       else if(isPauseTrue === true){
         isPauseTrue = false;
         startGame();
+        initGameOne();
       }else{
         isPauseTrue = true;
         pauseGame();
@@ -71,21 +89,12 @@ $(document).ready(function(){
     })
   })
 
-
-  //at click what happens - enemy disappear, score +=1
-  // $('.enemy').click(function(){
-  //   this.remove();
-  //   playerScore +=1;
-  // })
-
-
   //enemy random moving animation
   function movingEnemy(something){
     var index = setInterval(function(){
       var random = Math.random();
       var topPosition = parseInt(something[0].style.top);
       var leftPosition = parseInt(something[0].style.left);
-      console.log(leftPosition);
 
       if(random<0.33 && leftPosition <= 85.1){
         $(something).css({
@@ -110,7 +119,6 @@ $(document).ready(function(){
       if(dead(health)){
         gameOver();
       }
-      console.log(something[0].style.left);
     }, 500);
     return index;
   }
@@ -120,27 +128,19 @@ $(document).ready(function(){
 
 
 
-  //add event Timer
-
-
-  //global variables
-  var playerScore = 0;
-  var health = 100;
-  var enemyArray = [];
-  var isPauseTrue = false;
-  var hasGameStarted = false;
   //game logic -> when does game end
 
-
+  //hardcoded easy in
   function removeEnemy(enemy, index){
     $(enemy).click(function(){
       console.log(index);
       clearInterval(index);
       $(enemy).remove();
       playerScore +=1;
+
       //update playerScore
       $('#player1-score').text(playerScore);
-
+      winLevel1();
       enemyArray = $.grep(enemyArray, function(e){
         return e.index != index;
       })
@@ -157,11 +157,9 @@ $(document).ready(function(){
   //gameOver
   function gameOver(){
     $('.story').html("you have died");
-
     pauseGame();
     enemyArray = [];
     $('.story').show();
-
   }
 
   //function pauseGame
@@ -169,6 +167,7 @@ $(document).ready(function(){
     for(var i=0; i<enemyArray.length; i++){
       clearInterval(enemyArray[i].index);
     }
+    clearInterval(chapterOneIndex);
     console.log("paused");
   }
 
@@ -182,16 +181,39 @@ $(document).ready(function(){
     console.log("start");
   }
 
-  //function initiateGame
+  var chapterOneIndex;
+  //function initiateGame - zombie spawning
   function initGameOne(){
-    generateEnemy();
-    generateEnemy();
-    generateEnemy();
+    chapterOneIndex = setInterval(function(){
+      generateEnemy();
+      generateEnemy();
+      generateEnemy();
+    },3000);
+
   }
-  //implement functions
+
+  //Zombies to Kill
+  function difficultyLevel(difficulty){
+    switch(difficulty){
+      case "easy":
+        return 15;
+      case "medium":
+        return 30;
+      case "hard":
+        return 45;
+      case "extreme":
+        return 60;
+    }
+  }
 
 
-
-
+  function winLevel1(){
+    if(playerScore >= difficultyLevel("easy")){
+      pauseGame();
+      $('.story').html("you have WON!!!! saved your friend");
+      $('.story').show();
+      return true;
+    }return false;
+  }
 
 })
